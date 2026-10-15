@@ -1,0 +1,25 @@
+# dependencies & build output
+node_modules
+dist
+dev-dist
+coverage
+*.tsbuildinfo
+
+# secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# never commit exported notes or backups
+*.zip
+folio-backup-*.json
+
+# OS / editor noise
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.log
+
+# local tooling
+.claude/

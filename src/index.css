@@ -1,0 +1,409 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------------------------
+   Colour tokens. Dark (deep navy + warm gold) is the primary theme.
+   --------------------------------------------------------------------------------------------- */
+:root,
+[data-theme='dark'] {
+  --c-bg: #0b1222;
+  --c-panel: #0e172b;
+  --c-sidebar: #091020;
+  --c-elevated: #16223b;
+  --c-input: rgba(148, 163, 196, 0.11);
+  --c-border: rgba(148, 163, 196, 0.12);
+  --c-border-strong: rgba(148, 163, 196, 0.22);
+  --c-text: #e8ecf4;
+  --c-muted: #95a1b8;
+  --c-faint: #66728a;
+  --c-accent: #e4b453;
+  --c-accent-strong: #f2c76f;
+  --c-accent-ink: #1c1505;
+  --c-accent-soft: rgba(228, 180, 83, 0.14);
+  --c-select: rgba(228, 180, 83, 0.21);
+  --c-hover: rgba(255, 255, 255, 0.045);
+  --c-danger: #f07878;
+  --c-mark: rgba(228, 180, 83, 0.38);
+  --c-overlay: rgba(3, 7, 15, 0.6);
+  --c-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --c-bg: #fdfcf9;
+  --c-panel: #f7f5f0;
+  --c-sidebar: #efece4;
+  --c-elevated: #ffffff;
+  --c-input: rgba(30, 36, 50, 0.065);
+  --c-border: rgba(30, 36, 50, 0.09);
+  --c-border-strong: rgba(30, 36, 50, 0.16);
+  --c-text: #1c2331;
+  --c-muted: #667084;
+  --c-faint: #9aa1ae;
+  --c-accent: #a8761a;
+  --c-accent-strong: #8f6311;
+  --c-accent-ink: #fffaf0;
+  --c-accent-soft: rgba(196, 145, 40, 0.13);
+  --c-select: rgba(214, 163, 56, 0.24);
+  --c-hover: rgba(20, 24, 40, 0.045);
+  --c-danger: #cc4646;
+  --c-mark: rgba(232, 180, 70, 0.45);
+  --c-overlay: rgba(20, 24, 34, 0.32);
+  --c-shadow: 0 18px 50px rgba(30, 30, 40, 0.18), 0 2px 8px rgba(30, 30, 40, 0.08);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-panel: var(--c-panel);
+  --color-sidebar: var(--c-sidebar);
+  --color-elevated: var(--c-elevated);
+  --color-input: var(--c-input);
+  --color-line: var(--c-border);
+  --color-line-strong: var(--c-border-strong);
+  --color-ink: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+  --color-accent: var(--c-accent);
+  --color-accent-strong: var(--c-accent-strong);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-select: var(--c-select);
+  --color-hover: var(--c-hover);
+  --color-danger: var(--c-danger);
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   App shell: fixed to the screen, no rubber-banding. Only the list and editor scroll.
+   --------------------------------------------------------------------------------------------- */
+html,
+body {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  margin: 0;
+  background: var(--c-bg);
+}
+
+body {
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#root {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--vv-top, 0px);
+  /* The visual-viewport height while the iOS keyboard is open, otherwise the dynamic viewport. */
+  height: var(--vv-height, 100dvh);
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--c-mark);
+}
+
+/* iOS zooms into any input under 16px; keep them at least that. */
+input,
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+button {
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.scroll-area {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chrome {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* In the base layer so components can replace it with their own focus style. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--c-accent) 70%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Motion — subtle only, and none at all for people who ask for reduced motion.
+   --------------------------------------------------------------------------------------------- */
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}
+.animate-shake {
+  animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: none; }
+}
+.animate-fade-in { animation: fade-in 0.18s ease-out both; }
+.animate-rise-in { animation: rise-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.animate-sheet-in { animation: sheet-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.animate-slide-in-left { animation: slide-in-left 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+.stack-screen {
+  transition: transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.34s ease;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+mark.hit {
+  background: var(--c-mark);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Editor content
+   --------------------------------------------------------------------------------------------- */
+.folio-editor {
+  outline: none;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--c-text);
+  caret-color: var(--c-accent);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+  min-height: 100%;
+}
+
+@media (min-width: 1024px) {
+  .folio-editor {
+    font-size: 16px;
+  }
+}
+
+.folio-editor > * + * {
+  margin-top: 0.35em;
+}
+
+.folio-editor h1 {
+  font-size: 1.75em;
+  line-height: 1.22;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-top: 0.3em;
+}
+.folio-editor > h1:first-child {
+  margin-top: 0;
+}
+.folio-editor h2 {
+  font-size: 1.32em;
+  line-height: 1.3;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-top: 0.9em;
+}
+.folio-editor h3 {
+  font-size: 1.08em;
+  line-height: 1.35;
+  font-weight: 650;
+  margin-top: 0.8em;
+}
+
+.folio-editor strong {
+  font-weight: 650;
+}
+
+.folio-editor a {
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--c-accent) 45%, transparent);
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.folio-editor ul,
+.folio-editor ol {
+  padding-left: 1.5em;
+}
+.folio-editor ul {
+  list-style: disc;
+}
+.folio-editor ul ul {
+  list-style: circle;
+}
+.folio-editor ol {
+  list-style: decimal;
+}
+.folio-editor li::marker {
+  color: var(--c-accent);
+}
+.folio-editor li > p + * {
+  margin-top: 0.2em;
+}
+.folio-editor li + li {
+  margin-top: 0.15em;
+}
+
+.folio-editor blockquote {
+  border-left: 3px solid var(--c-border-strong);
+  padding-left: 0.9em;
+  color: var(--c-muted);
+}
+
+.folio-editor code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--c-input);
+  border-radius: 5px;
+  padding: 0.1em 0.3em;
+}
+.folio-editor pre {
+  background: var(--c-input);
+  border-radius: 10px;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+}
+.folio-editor pre code {
+  background: none;
+  padding: 0;
+}
+.folio-editor hr {
+  border: none;
+  border-top: 1px solid var(--c-border-strong);
+  margin: 1.2em 0;
+}
+
+/* Checklists: gold rounded-square checkboxes with a generous tap area. */
+.folio-editor ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.1em;
+}
+.folio-editor ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+}
+.folio-editor ul[data-type='taskList'] li > label {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.6em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.folio-editor ul[data-type='taskList'] li > div {
+  flex: 1;
+  min-width: 0;
+}
+.folio-editor ul[data-type='taskList'] input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0;
+  border: 1.6px solid color-mix(in srgb, var(--c-accent) 75%, var(--c-muted));
+  border-radius: 0.36em;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+.folio-editor ul[data-type='taskList'] input[type='checkbox']::before {
+  content: '';
+  position: absolute;
+  inset: -0.55em;
+}
+.folio-editor ul[data-type='taskList'] input[type='checkbox']::after {
+  content: '';
+  width: 0.62em;
+  height: 0.62em;
+  transform: scale(0);
+  transition: transform 0.15s ease;
+  background: var(--c-accent-ink);
+  clip-path: polygon(14% 52%, 0 66%, 38% 100%, 100% 22%, 86% 8%, 38% 72%);
+}
+.folio-editor ul[data-type='taskList'] input[type='checkbox']:checked {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+}
+.folio-editor ul[data-type='taskList'] input[type='checkbox']:checked::after {
+  transform: scale(1);
+}
+.folio-editor ul[data-type='taskList'] li[data-checked='true'] > div {
+  color: var(--c-muted);
+}
+.folio-editor ul[data-type='taskList'] ul[data-type='taskList'] {
+  margin-top: 0.15em;
+}
+
+/* Placeholder for the empty title line. */
+.folio-editor .is-empty:first-child::before,
+.folio-editor .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--c-faint);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.folio-editor[contenteditable='false'] {
+  -webkit-user-select: text;
+  user-select: text;
+}
